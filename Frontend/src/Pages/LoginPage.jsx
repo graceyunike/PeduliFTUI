@@ -1,8 +1,8 @@
 import React from "react";
-import LogoTangan from "./assets/logotangan.svg";
-import Logo from "./assets/logo.svg";
+import LogoTangan from "../assets/logotangan.svg";
+import Logo from "../assets/logo.svg";
 
-export default function App() {
+export default function LoginPage() {
         return (
             <div className="flex h-screen">
             {/* LEFT SIDE */}
