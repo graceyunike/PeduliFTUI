@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import LogoTangan from "../assets/logotangan.svg";
 import Logo from "../assets/logo.svg";
 
@@ -36,7 +37,7 @@ export default function LoginPage() {
                 />
                 <input
                     type="password"
-                    placeholder="Create password"
+                    placeholder="Enter your password"
                     className="bg-[#F2F2F2] border border-[#005384] rounded-md p-3 text-[#005384] placeholder:text-[#005384]/70 focus:outline-none focus:ring-2 focus:ring-[#13A3B5]"
                 />
                 <button
@@ -46,6 +47,16 @@ export default function LoginPage() {
                     Login
                 </button>
                 </form>
+
+                <p className="text-white text-lg font-medium text-center mt-7">
+                Don't have an account?{" "}
+                <Link
+                to="/register"
+                className="font-semibold hover:underline hover:text-[#01395f] transition"
+                >
+                Register now
+                </Link>
+            </p>
     
             </div>
             </div>
