@@ -33,7 +33,7 @@ export default function LoginPage() {
             />
             <input
                 type="password"
-                placeholder="Create password"
+                placeholder="Enter your password"
                 className="bg-[#F2F2F2] border border-[#005384] rounded-md p-3 text-[#005384] placeholder:text-[#005384]/70 focus:outline-none focus:ring-2 focus:ring-[#13A3B5]"
             />
             <button
