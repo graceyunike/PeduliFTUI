@@ -1,3 +1,9 @@
+# Ignore environment files
+donation-api/.env
+
+# Ignore node_modules in backend and frontend
+donation-api/node_modules/
+Frontend/node_modules/
 # Logs
 logs
 *.log
