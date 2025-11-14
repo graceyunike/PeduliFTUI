@@ -1,55 +1,95 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Logo from "../assets/logo.svg";
 
 export default function Navbar() {
     return (
-        <nav className="fixed top-0 left-0 w-full h-[70px] bg-[#13A3B5]/90 flex items-center justify-between px-10 shadow-md z-50">
-        {/* LEFT SIDE - LOGO */}
-        <Link to="/" className="flex items-center gap-2">
-            <img src={Logo} alt="PeduliFTUI Logo" className="w-[150px] h-auto" />
-        </Link>
+        <nav className="sticky top-0 z-50 w-full bg-[#13A3B5]/90 backdrop-blur-md shadow-sm">
+            <div className="max-w-[1280px] mx-auto flex items-center justify-between h-[70px] px-6">
 
-        {/* CENTER LINKS */}
-        <div className="flex items-center gap-10">
-            <Link
-            to="/profile"
-            className="text-[#005384] font-bold text-[19px] hover:underline transition"
-            >
-            Profile
-            </Link>
-            <Link
-            to="/about"
-            className="text-white font-bold text-[19px] hover:underline transition"
-            >
-            About
-            </Link>
-            <Link
-            to="/event"
-            className="text-white font-bold text-[19px] hover:underline transition"
-            >
-            Event Campaign
-            </Link>
-            <Link
-            to="/sentiments"
-            className="text-white font-bold text-[19px] hover:underline transition"
-            >
-            Sentiments
-            </Link>
-        </div>
+                {/* LEFT — LOGO */}
+                <Link to="/" className="flex items-center">
+                    <img 
+                        src={Logo}
+                        alt="PeduliFTUI Logo"
+                        className="h-[48px] w-auto"
+                    />
+                </Link>
 
-        {/* RIGHT SIDE - BUTTONS */}
-        <div className="flex items-center gap-6">
-            <button className="bg-white text-[#005384] font-bold text-[19px] px-5 py-2 rounded-lg shadow-md hover:bg-[#f0f0f0] transition">
-            Donate
-            </button>
-            <Link
-            to="/contact"
-            className="text-white font-bold text-[19px] hover:underline transition"
-            >
-            Contact Us
-            </Link>
-        </div>
+                {/* CENTER — MENU */}
+                <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 gap-10 text-white font-semibold text-[17px]">
+
+                    <NavLink
+                        to="/"
+                        className={({ isActive }) =>
+                            isActive ? "text-[#005384]" : "hover:text-[#003d63]"
+                        }
+                    >
+                        Home
+                    </NavLink>
+
+                    <NavLink
+                        to="/about"
+                        className={({ isActive }) =>
+                            isActive ? "text-[#005384]" : "hover:text-[#003d63]"
+                        }
+                    >
+                        About
+                    </NavLink>
+
+                    <NavLink
+                        to="/event-campaign"
+                        className={({ isActive }) =>
+                            isActive ? "text-[#005384]" : "hover:text-[#003d63]"
+                        }
+                    >
+                        Event Campaign
+                    </NavLink>
+
+                    <NavLink
+                        to="/sentiments"
+                        className={({ isActive }) =>
+                            isActive ? "text-[#005384]" : "hover:text-[#003d63]"
+                        }
+                    >
+                        Sentiments
+                    </NavLink>
+
+                </div>
+
+                {/* RIGHT — DONATE + CONTACT */}
+                <div className="flex items-center gap-6 text-white font-semibold text-[17px]">
+
+                    <Link
+                        to="/donate"
+                        className="bg-white text-[#005384] px-5 py-2 rounded-xl font-bold shadow hover:bg-[#f5f5f5] transition"
+                    >
+                        Donate
+                    </Link>
+
+                    <NavLink
+                        to="/contact"
+                        className={({ isActive }) =>
+                            isActive ? "text-[#005384]" : "hover:text-[#003d63]"
+                        }
+                    >
+                        Contact Us
+                    </NavLink>
+                </div>
+
+            </div>
+
+            {/* MOBILE (tanpa hamburger dulu) */}
+            <div className="md:hidden flex flex-wrap justify-center gap-5 py-3 text-white font-semibold text-[16px] bg-[#13A3B5]">
+                <NavLink to="/" className="hover:text-[#003d63]">Home</NavLink>
+                <NavLink to="/about" className="hover:text-[#003d63]">About</NavLink>
+                <NavLink to="/event-campaign" className="hover:text-[#003d63]">Event Campaign</NavLink>
+                <NavLink to="/sentiments" className="hover:text-[#003d63]">Sentiments</NavLink>
+                <NavLink to="/contact" className="hover:text-[#003d63]">Contact</NavLink>
+                <Link to="/donate" className="bg-white text-[#005384] px-4 py-1 rounded-xl font-bold shadow">
+                    Donate
+                </Link>
+            </div>
+
         </nav>
     );
 }
