@@ -1,9 +1,49 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser, loginUser } from "../services/api";
 import LogoTangan from "../assets/logotangan.svg";
 import Logo from "../assets/logo.svg";
 
 export default function RegistrationPage() {
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
+
+        try {
+            if (!name || !email || !password) {
+                setError("Semua field harus diisi");
+                setLoading(false);
+                return;
+            }
+
+            if (password.length < 6) {
+                setError("Password minimal 6 karakter");
+                setLoading(false);
+                return;
+            }
+
+            // Register user
+            const registerResult = await registerUser(name, email, password);
+
+            // Jika registrasi berhasil, langsung login
+            const loginResult = await loginUser(email, password);
+
+            // Arahkan ke halaman utama atau dashboard (SEMENTARA)
+            navigate("/login");
+        } catch (err) {
+            setError(err.message || "Registrasi gagal. Silakan coba lagi.");
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <div className="flex flex-col md:flex-row h-auto md:h-screen">
         {/* LEFT SIDE */}
@@ -30,27 +70,39 @@ export default function RegistrationPage() {
             Registration
             </h2>
 
-            <form className="flex flex-col gap-4 md:gap-6 w-full max-w-[460px]">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 md:gap-6 w-full max-w-[460px]">
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    {error}
+                </div>
+            )}
             <input
                 type="text"
                 placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="bg-[#F2F2F2] border border-[#005384] rounded-md px-4 py-3 text-[#005384] placeholder-[#005384] text-base md:text-lg font-light focus:outline-none focus:ring-2 focus:ring-[#13A3B5]"
             />
             <input
                 type="email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="bg-[#F2F2F2] border border-[#005384] rounded-md px-4 py-3 text-[#005384] placeholder-[#005384] text-base md:text-lg font-light focus:outline-none focus:ring-2 focus:ring-[#13A3B5]"
             />
             <input
                 type="password"
                 placeholder="Create password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="bg-[#F2F2F2] border border-[#005384] rounded-md px-4 py-3 text-[#005384] placeholder-[#005384] text-base md:text-lg font-light focus:outline-none focus:ring-2 focus:ring-[#13A3B5]"
             />
             <button
                 type="submit"
-                className="bg-[#005384] hover:bg-[#01395f] text-white font-semibold text-lg md:text-xl py-3 rounded-md transition"
+                disabled={loading}
+                className="bg-[#005384] hover:bg-[#01395f] disabled:bg-gray-400 text-white font-semibold text-lg md:text-xl py-3 rounded-md transition"
             >
-                Register Now
+                {loading ? "Loading..." : "Register Now"}
             </button>
 
             <p className="text-[#005384] text-base md:text-lg font-medium text-center mt-4">

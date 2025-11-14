@@ -29,15 +29,40 @@ const getUserById = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-    try{
-            const user = await User.create(req.body);
-            res.status(201).json(user);
+    try {
+        const { name, email, password } = req.body;
+
+        // Validasi input
+        if (!name || !email || !password) {
+            return res.status(400).json({ error: 'Name, email, dan password harus diisi' });
         }
-        catch (error)
-        {
-            console.error(error);
-            res.status(500).json({ error: error.message });
+
+        // Cek apakah email sudah terdaftar
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email sudah terdaftar' });
         }
+
+        // Buat user dengan password yang akan di-hash oleh virtual setter
+        const user = await User.create({
+            name,
+            email,
+            password, // akan di-hash otomatis oleh userSchema.virtual
+            //role: role || 'donor'
+        });
+
+        // Jangan return password hash
+        const userResponse = user.toObject();
+        delete userResponse.password_hash;
+
+        res.status(201).json({
+            message: 'User berhasil didaftarkan',
+            user: userResponse
+        });
+    } catch (error) {
+        console.error('Create user error:', error);
+        res.status(500).json({ error: error.message });
+    }
 };
 
 const updateUser = async (req, res) => {
