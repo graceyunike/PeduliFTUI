@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import EventBox from '../Components/EventBox.jsx';
+import Navbar from '../Components/Navbar.jsx';
 import { eventData } from './eventData';
 
 const EventCampaignPage = () => {
@@ -24,6 +25,9 @@ const EventCampaignPage = () => {
     : eventData.filter(item => item.created_by === selectedDept); 
 
   return (
+    <>
+    <Navbar />
+    
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-6xl mx-auto">
 
@@ -65,6 +69,7 @@ const EventCampaignPage = () => {
 
       </div>
     </div>
+    </>
   );
 };
 

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { eventData } from './eventData';
 import { timelineData } from './timelineData';
+import Navbar from '../Components/Navbar.jsx';
 
 const EventDetailPage = () => {
     const navigate = useNavigate();
@@ -49,6 +50,9 @@ const EventDetailPage = () => {
     };
 
     return (
+        <>
+        <Navbar />
+        
         <div className="min-h-screen bg-gray-50 py-10 px-4">
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
 
@@ -166,6 +170,7 @@ const EventDetailPage = () => {
 
             </div>
         </div>
+        </>
     );
 };
 
