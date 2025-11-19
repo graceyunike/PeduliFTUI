@@ -18,6 +18,9 @@ export const loginUser = async (email, password) => {
       throw new Error(data.error || 'Login gagal');
     }
 
+    // Debug: tampilkan data respons login
+    console.log('login response data:', data);
+
     // Simpan token ke localStorage
     if (data.token) {
       localStorage.setItem('token', data.token);
