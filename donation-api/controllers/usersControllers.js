@@ -2,7 +2,14 @@ import User from '../models/userModels.js';
 
 const getUsers = async (req, res) => {
     try{
-        const users = await User.find();
+        // Support optional role query parameter, e.g. /users?role=admin
+        const { role } = req.query;
+        const filter = {};
+        if (role) {
+            // Case-insensitive match for role
+            filter.role = new RegExp(`^${role}$`, 'i');
+        }
+        const users = await User.find(filter);
         res.status(200).json(users);
     }
     catch (error)

@@ -1,17 +1,50 @@
 // DashboardPage.jsx
 import React, { useState, useEffect } from 'react';
-import { eventData } from './eventData';
 import '../DashboardPage.css';
+import { fetchCampaigns, getCurrentUser } from '../services/api';
 
 const DashboardPage = () => {
     const [campaigns, setCampaigns] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [modalType, setModalType] = useState(''); // 'campaign' or 'post'
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
 
-    // Filter hanya campaign dari PENGMAS IME FTUI
     useEffect(() => {
-        const filteredCampaigns = eventData.filter(item => item.created_by === "PENGMAS IME FTUI");
-        setCampaigns(filteredCampaigns);
+        let mounted = true;
+        const load = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const user = getCurrentUser();
+                if (!user) throw new Error('User not logged in');
+                if (mounted) setCurrentUser(user);
+
+                const allCampaigns = await fetchCampaigns();
+                const myCampaigns = allCampaigns.filter(c => c.organizer_id === user.user_id);
+
+                const mapped = myCampaigns.map(c => ({
+                    campaign_id: c.campaign_id,
+                    title: c.title,
+                    picture: c.image_url || c.picture || '',
+                    description: c.description,
+                    goal_amount: c.goal_amount || 0,
+                    collected_amount: c.collected_amount || 0,
+                    deadline: c.deadline || c.updatedAt || c.createdAt || null,
+                    status: c.status === 'ongoing' ? 'Active' : (c.status || 'Unknown')
+                }));
+
+                if (mounted) setCampaigns(mapped);
+            } catch (err) {
+                console.error('Failed to load dashboard campaigns', err);
+                if (mounted) setError(err.message || 'Failed to load campaigns');
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+        load();
+        return () => { mounted = false; };
     }, []);
 
     const handleCreateCampaign = () => {
@@ -89,11 +122,17 @@ const DashboardPage = () => {
                 <div className="campaign-section">
                     <div className="section-header">
                         <h2 className="section-title">Campaign Donasi Saya</h2>
-                        <p className="section-subtitle">Daftar campaign yang telah dibuat oleh PENGMAS IME FTUI</p>
+                        <p className="section-subtitle">Daftar campaign yang telah dibuat oleh {currentUser ? currentUser.name : 'organisasi Anda'}</p>
                     </div>
 
                     <div className="p-6">
-                        {campaigns.length === 0 ? (
+                        {loading ? (
+                            <div className="flex items-center justify-center py-20">
+                                <div className="w-12 h-12 border-4 border-t-transparent border-[#005384] rounded-full animate-spin" />
+                            </div>
+                        ) : error ? (
+                            <div className="text-red-500">{error}</div>
+                        ) : campaigns.length === 0 ? (
                             <div className="empty-state">
                                 <h3>Belum ada campaign yang dibuat</h3>
                                 <p className="text-gray-500 mb-4">Mulai buat campaign pertama Anda untuk mengumpulkan donasi</p>

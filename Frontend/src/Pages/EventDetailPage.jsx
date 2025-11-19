@@ -1,27 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { eventData } from './eventData';
-import { timelineData } from './timelineData';
 import Navbar from '../Components/Navbar.jsx';
+import { fetchCampaignById, fetchTimelinePosts, fetchUserById } from '../services/api';
 
 const EventDetailPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const [campaign, setCampaign] = useState(null);
     const [timeline, setTimeline] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [showFullDescription, setShowFullDescription] = useState(false);
 
     useEffect(() => {
-        const cid = parseInt(id);
-        const foundCampaign = eventData.find(item => item.campaign_id === cid);
-        const foundTimeline = timelineData.filter(item => item.campaign_id === cid);
+        let mounted = true;
+        const loadData = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                // Get campaign by id
+                const campaignData = await fetchCampaignById(id);
 
-        setCampaign(foundCampaign);
-        setTimeline(foundTimeline);
+                // Fetch timeline posts and filter by organizer/user id (timeline posts don't have campaign_id)
+                const allPosts = await fetchTimelinePosts();
+                const filteredPosts = allPosts.filter(p => p.user_id === campaignData.organizer_id);
+
+                // Fetch organizer (user) to get name
+                let organizerName = 'Unknown';
+                try {
+                    const user = await fetchUserById(campaignData.organizer_id);
+                    organizerName = user.name || organizerName;
+                } catch (uErr) {
+                    console.warn('Organizer lookup failed', uErr);
+                }
+
+                // Map campaign fields to match UI expectations
+                const mappedCampaign = {
+                    campaign_id: campaignData.campaign_id,
+                    title: campaignData.title,
+                    description: campaignData.description,
+                    picture: campaignData.image_url || '',
+                    created_by: organizerName,
+                    organizer_id: campaignData.organizer_id,
+                    goal_amount: campaignData.goal_amount || 0,
+                    collected_amount: campaignData.collected_amount || 0,
+                    deadline: campaignData.deadline || campaignData.updatedAt || campaignData.createdAt || null
+                };
+
+                if (mounted) {
+                    setCampaign(mappedCampaign);
+                    setTimeline(filteredPosts.map(p => ({ post_id: p.post_id, content: p.content, media_url: p.image_url || '', user_id: p.user_id })));
+                }
+            } catch (err) {
+                console.error('Failed to load event detail', err);
+                if (mounted) setError(err.message || 'Failed to load event');
+            } finally {
+                if (mounted) setLoading(false);
+            }
+        };
+        loadData();
+        return () => { mounted = false; };
     }, [id]);
 
-    if (!campaign) {
-        return <div className="text-center py-10">Event tidak ditemukan</div>;
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <div className="w-12 h-12 border-4 border-t-transparent border-[#005384] rounded-full animate-spin" />
+            </div>
+        );
+    }
+
+    if (error || !campaign) {
+        return <div className="text-center py-10 text-red-500">{error || 'Event tidak ditemukan'}</div>;
     }
 
     // Hitung persentase donasi
@@ -145,7 +195,7 @@ const EventDetailPage = () => {
                                     {/* Header: Author */}
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">
-                                            {campaign.created_by.charAt(0)}
+                                            {campaign.created_by ? campaign.created_by.charAt(0) : '?'}
                                         </div>
                                         <span className="font-semibold text-sm">{campaign.created_by}</span>
                                     </div>
