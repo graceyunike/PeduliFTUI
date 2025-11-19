@@ -1,7 +1,7 @@
 // DashboardPage.jsx
 import React, { useState, useEffect } from 'react';
 import { eventData } from './eventData';
-import '../Dashboard.css';
+import '../DashboardPage.css';
 
 const DashboardPage = () => {
     const [campaigns, setCampaigns] = useState([]);
