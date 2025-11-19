@@ -84,3 +84,16 @@ export const getToken = () => {
 export const isAuthenticated = () => {
   return !!getToken();
 };
+
+// Fetch all users
+export const fetchUsers = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch users');
+    return data;
+  } catch (error) {
+    console.error('Fetch users error:', error);
+    throw error;
+  }
+};
