@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
+import LandingPage from "./Pages/LandingPage";   // ← Tambahkan ini
 import LoginPage from "./Pages/LoginPage";
 import RegistrationPage from "./Pages/RegistrationPage";
 import EventCampaignPage from "./Pages/EventCampaignPage";
@@ -12,14 +14,20 @@ export default function App() {
   return (
     <Router>
       <Routes>
+        {/* Landing Page */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
+
+        {/* Event */}
         <Route path="/event-campaign" element={<EventCampaignPage />} />
         <Route path="/event-detail/:id" element={<EventDetailPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/donate" element={<PaymentPage />} />
         <Route path="/post-detail/:postId" element={<PostDetailPage />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
