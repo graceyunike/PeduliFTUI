@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../DashboardPage.css';
-import { fetchCampaigns, getCurrentUser } from '../services/api';
+import { fetchCampaigns, getCurrentUser, postCampaign, createTimelinePost } from '../services/api';
 
 const DashboardPage = () => {
     const [campaigns, setCampaigns] = useState([]);
@@ -54,6 +54,84 @@ const DashboardPage = () => {
     const handleCreatePost = () => {
         setModalType('post');
         setShowCreateModal(true);
+    };
+
+    // --- Campaign form state ---
+    const [campTitle, setCampTitle] = useState('');
+    const [campDesc, setCampDesc] = useState('');
+    const [campGoal, setCampGoal] = useState('');
+    const [campImageUrl, setCampImageUrl] = useState('');
+
+    // --- Post form state ---
+    const [postCampaignId, setPostCampaignId] = useState('');
+    const [postContent, setPostContent] = useState('');
+    const [postMediaUrl, setPostMediaUrl] = useState('');
+
+    const resetFormState = () => {
+        setCampTitle(''); setCampDesc(''); setCampGoal(''); setCampImageUrl('');
+        setPostCampaignId(''); setPostContent(''); setPostMediaUrl('');
+    };
+
+    const handleSubmitCreateCampaign = async (e) => {
+        e?.preventDefault?.();
+        try {
+            const user = getCurrentUser();
+            if (!user) throw new Error('User not logged in');
+
+            const payload = {
+                title: campTitle,
+                description: campDesc,
+                goal_amount: Number(campGoal) || 0,
+                organizer_id: user.user_id,
+                image_url: campImageUrl || undefined
+            };
+
+            const created = await postCampaign(payload);
+            // reload campaigns
+            const allCampaigns = await fetchCampaigns();
+            const myCampaigns = allCampaigns.filter(c => c.organizer_id === user.user_id);
+            const mapped = myCampaigns.map(c => ({
+                campaign_id: c.campaign_id,
+                title: c.title,
+                picture: c.image_url || c.picture || '',
+                description: c.description,
+                goal_amount: c.goal_amount || 0,
+                collected_amount: c.collected_amount || 0,
+                deadline: c.deadline || c.updatedAt || c.createdAt || null,
+                status: c.status === 'ongoing' ? 'Active' : (c.status || 'Unknown')
+            }));
+            setCampaigns(mapped);
+            resetFormState();
+            setShowCreateModal(false);
+        } catch (err) {
+            console.error('Create campaign failed', err);
+            alert(err.message || 'Gagal membuat campaign');
+        }
+    };
+
+    const handleSubmitCreatePost = async (e) => {
+        e?.preventDefault?.();
+        try {
+            const user = getCurrentUser();
+            if (!user) throw new Error('User not logged in');
+            if (!postCampaignId) throw new Error('Pilih campaign terlebih dahulu');
+
+            const payload = {
+                campaign_id: postCampaignId,
+                user_id: user.user_id,
+                created_by: user.name,
+                content: postContent,
+                media_url: postMediaUrl || undefined,
+                image_url: postMediaUrl || undefined
+            };
+
+            await createTimelinePost(payload);
+            resetFormState();
+            setShowCreateModal(false);
+        } catch (err) {
+            console.error('Create post failed', err);
+            alert(err.message || 'Gagal membuat postingan');
+        }
     };
 
     const formatDate = (dateStr) => {
@@ -197,54 +275,57 @@ const DashboardPage = () => {
                         </h3>
 
                         {modalType === 'campaign' ? (
-                            <form className="space-y-4">
+                            <form className="space-y-4" onSubmit={handleSubmitCreateCampaign}>
                                 <div className="form-group">
                                     <label className="form-label">Judul Campaign</label>
-                                    <input type="text" className="form-input" />
+                                    <input type="text" className="form-input" value={campTitle} onChange={e => setCampTitle(e.target.value)} required />
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Deskripsi</label>
-                                    <textarea className="form-textarea" rows="3"></textarea>
+                                    <textarea className="form-textarea" rows="3" value={campDesc} onChange={e => setCampDesc(e.target.value)} required></textarea>
                                 </div>
                                 <div className="form-group">
                                     <label className="form-label">Target Donasi</label>
-                                    <input type="number" className="form-input" />
+                                    <input type="number" className="form-input" value={campGoal} onChange={e => setCampGoal(e.target.value)} required />
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Deadline</label>
-                                    <input type="date" className="form-input" />
+                                    <label className="form-label">Gambar (URL)</label>
+                                    <input type="text" className="form-input" value={campImageUrl} onChange={e => setCampImageUrl(e.target.value)} placeholder="https://..." />
                                 </div>
-                                <div className="form-group">
-                                    <label className="form-label">Gambar</label>
-                                    <input type="file" className="form-file" />
-                                </div>
+                                <div className="text-sm text-gray-500">Organizer: <strong>{currentUser?.name}</strong></div>
                             </form>
                         ) : (
-                            <form className="space-y-4">
+                            <form className="space-y-4" onSubmit={handleSubmitCreatePost}>
+                                <div className="form-group">
+                                    <label className="form-label">Pilih Campaign</label>
+                                    <select className="form-input" value={postCampaignId} onChange={e => setPostCampaignId(e.target.value)} required>
+                                        <option value="">-- Pilih Campaign --</option>
+                                        {campaigns.map(c => (
+                                            <option key={c.campaign_id} value={c.campaign_id}>{c.title}</option>
+                                        ))}
+                                    </select>
+                                </div>
                                 <div className="form-group">
                                     <label className="form-label">Konten Postingan</label>
-                                    <textarea
-                                        className="form-textarea"
-                                        rows="4"
-                                        placeholder="Bagikan update terbaru tentang campaign Anda..."
-                                    ></textarea>
+                                    <textarea className="form-textarea" rows="4" placeholder="Bagikan update terbaru tentang campaign Anda..." value={postContent} onChange={e => setPostContent(e.target.value)} required></textarea>
                                 </div>
                                 <div className="form-group">
-                                    <label className="form-label">Upload Media (Opsional)</label>
-                                    <input type="file" className="form-file" />
+                                    <label className="form-label">Media URL (Opsional)</label>
+                                    <input type="text" className="form-input" value={postMediaUrl} onChange={e => setPostMediaUrl(e.target.value)} placeholder="https://..." />
                                 </div>
+                                <div className="text-sm text-gray-500">Posted by: <strong>{currentUser?.name}</strong></div>
                             </form>
                         )}
 
                         <div className="modal-actions">
                             <button
-                                onClick={() => setShowCreateModal(false)}
+                                onClick={() => { resetFormState(); setShowCreateModal(false); }}
                                 className="btn-cancel"
                             >
                                 Batal
                             </button>
                             <button
-                                onClick={() => setShowCreateModal(false)}
+                                onClick={(e) => { modalType === 'campaign' ? handleSubmitCreateCampaign(e) : handleSubmitCreatePost(e); }}
                                 className="btn-submit"
                             >
                                 {modalType === 'campaign' ? 'Buat Campaign' : 'Posting'}
