@@ -8,6 +8,7 @@ const EventDetailPage = () => {
     const { id } = useParams();
     const [campaign, setCampaign] = useState(null);
     const [timeline, setTimeline] = useState([]);
+    const [organizer, setOrganizer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showFullDescription, setShowFullDescription] = useState(false);
@@ -21,15 +22,16 @@ const EventDetailPage = () => {
                 // Get campaign by id
                 const campaignData = await fetchCampaignById(id);
 
-                // Fetch timeline posts and filter by organizer/user id (timeline posts don't have campaign_id)
-                const allPosts = await fetchTimelinePosts();
-                const filteredPosts = allPosts.filter(p => p.user_id === campaignData.organizer_id);
+                // Fetch timeline posts for this campaign (API supports ?campaign_id=...)
+                const filteredPosts = await fetchTimelinePosts(campaignData.campaign_id);
 
-                // Fetch organizer (user) to get name
+                // Fetch organizer (user) to get name and profile picture
                 let organizerName = 'Unknown';
+                let organizerObj = null;
                 try {
                     const user = await fetchUserById(campaignData.organizer_id);
                     organizerName = user.name || organizerName;
+                    organizerObj = user;
                 } catch (uErr) {
                     console.warn('Organizer lookup failed', uErr);
                 }
@@ -49,7 +51,8 @@ const EventDetailPage = () => {
 
                 if (mounted) {
                     setCampaign(mappedCampaign);
-                    setTimeline(filteredPosts.map(p => ({ post_id: p.post_id, content: p.content, media_url: p.image_url || '', user_id: p.user_id })));
+                    setOrganizer(organizerObj);
+                    setTimeline(filteredPosts.map(p => ({ post_id: p.post_id, content: p.content, media_url: p.media_url || p.image_url || '', user_id: p.user_id, created_by: p.created_by || null })));
                 }
             } catch (err) {
                 console.error('Failed to load event detail', err);
@@ -194,10 +197,18 @@ const EventDetailPage = () => {
                                 >
                                     {/* Header: Author */}
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">
-                                            {campaign.created_by ? campaign.created_by.charAt(0) : '?'}
-                                        </div>
-                                        <span className="font-semibold text-sm">{campaign.created_by}</span>
+                                        {organizer && organizer.profile_picture ? (
+                                            <img
+                                                src={organizer.profile_picture}
+                                                alt={organizer.name || campaign.created_by}
+                                                className="w-8 h-8 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">
+                                                {campaign.created_by ? campaign.created_by.charAt(0) : '?'}
+                                            </div>
+                                        )}
+                                        <span className="font-semibold text-sm">{organizer?.name || campaign.created_by}</span>
                                     </div>
 
                                     {/* Content */}

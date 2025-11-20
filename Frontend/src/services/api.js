@@ -125,9 +125,10 @@ export const fetchCampaignById = async (id) => {
 };
 
 // Fetch timeline posts
-export const fetchTimelinePosts = async () => {
+export const fetchTimelinePosts = async (campaignId = null) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/timeline-posts`);
+    const url = campaignId ? `${API_BASE_URL}/timeline-posts?campaign_id=${encodeURIComponent(campaignId)}` : `${API_BASE_URL}/timeline-posts`;
+    const response = await fetch(url);
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Failed to fetch timeline posts');
     return data;
@@ -146,6 +147,19 @@ export const fetchUserById = async (id) => {
     return data;
   } catch (error) {
     console.error('Fetch user by id error:', error);
+    throw error;
+  }
+};
+
+// Fetch single timeline post by id
+export const fetchPostById = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/timeline-posts/${id}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch post');
+    return data;
+  } catch (error) {
+    console.error('Fetch post by id error:', error);
     throw error;
   }
 };

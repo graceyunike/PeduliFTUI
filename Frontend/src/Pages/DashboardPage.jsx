@@ -1,4 +1,3 @@
-// DashboardPage.jsx
 import React, { useState, useEffect } from 'react';
 import '../DashboardPage.css';
 import { fetchCampaigns, getCurrentUser } from '../services/api';
@@ -80,7 +79,7 @@ const DashboardPage = () => {
                         Dashboard Organisasi
                     </h1>
                     <p className="dashboard-subtitle">Kelola campaign dan postingan donasi Anda</p>
-                    
+
                     {/* Action Buttons */}
                     <div className="action-buttons">
                         <button
@@ -224,9 +223,9 @@ const DashboardPage = () => {
                             <form className="space-y-4">
                                 <div className="form-group">
                                     <label className="form-label">Konten Postingan</label>
-                                    <textarea 
-                                        className="form-textarea" 
-                                        rows="4" 
+                                    <textarea
+                                        className="form-textarea"
+                                        rows="4"
                                         placeholder="Bagikan update terbaru tentang campaign Anda..."
                                     ></textarea>
                                 </div>

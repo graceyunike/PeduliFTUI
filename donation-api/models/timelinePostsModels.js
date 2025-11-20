@@ -7,16 +7,41 @@ const timelinePostSchema = new mongoose.Schema({
         default: () => crypto.randomUUID(),
         unique: true
     },
+    // Associate with a campaign
+    campaign_id: {
+        type: String,
+        required: false
+    },
+    // Optional reference to a user id (kept for compatibility)
     user_id: {
         type: String,
-        required: true
+        required: false
+    },
+    // Human-readable creator name (e.g. organization name)
+    created_by: {
+        type: String,
+        maxlength: 200
     },
     content: {
         type: String,
         required: true
     },
+    // Support both media_url and image_url for compatibility with frontend
+    media_url: {
+        type: String,
+        maxlength: 1000
+    },
     image_url: {
-        type: String
+        type: String,
+        maxlength: 1000
+    },
+    likes_count: {
+        type: Number,
+        default: 0
+    },
+    comments_count: {
+        type: Number,
+        default: 0
     }
     }, {
     timestamps: true
