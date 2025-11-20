@@ -1,4 +1,5 @@
 import Donation from '../models/donationModels.js';
+import DonationCampaign from '../models/donationCampaignsModels.js';
 
 const getDonations = async (req, res) => {
     try {
@@ -23,6 +24,21 @@ const getDonationById = async (req, res) => {
 const createDonation = async (req, res) => {
     try {
         const donation = await Donation.create(req.body);
+
+        // After creating the donation, increment the related campaign's collected_amount
+        try {
+            const { campaign_id, amount } = req.body;
+            if (campaign_id && typeof amount === 'number') {
+                await DonationCampaign.findOneAndUpdate(
+                    { campaign_id },
+                    { $inc: { collected_amount: amount } },
+                    { new: true }
+                );
+            }
+        } catch (incErr) {
+            console.error('Failed to increment campaign collected_amount', incErr);
+        }
+
         res.status(201).json(donation);
     } catch (error) {
         res.status(500).json({ error: error.message });

@@ -1,6 +1,8 @@
 // API Configuration
 const API_BASE_URL = 'http://localhost:3000';
 
+// --- AUTHENTICATION ---
+
 // Login API call
 export const loginUser = async (email, password) => {
   try {
@@ -85,6 +87,8 @@ export const isAuthenticated = () => {
   return !!getToken();
 };
 
+// --- USER DATA ---
+
 // Fetch all users
 export const fetchUsers = async () => {
   try {
@@ -97,6 +101,21 @@ export const fetchUsers = async () => {
     throw error;
   }
 };
+
+// Fetch user by id
+export const fetchUserById = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${id}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch user');
+    return data;
+  } catch (error) {
+    console.error('Fetch user by id error:', error);
+    throw error;
+  }
+};
+
+// --- CAMPAIGNS ---
 
 // Fetch donation campaigns
 export const fetchCampaigns = async () => {
@@ -124,46 +143,6 @@ export const fetchCampaignById = async (id) => {
   }
 };
 
-// Fetch timeline posts
-export const fetchTimelinePosts = async (campaignId = null) => {
-  try {
-    const url = campaignId ? `${API_BASE_URL}/timeline-posts?campaign_id=${encodeURIComponent(campaignId)}` : `${API_BASE_URL}/timeline-posts`;
-    const response = await fetch(url);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Failed to fetch timeline posts');
-    return data;
-  } catch (error) {
-    console.error('Fetch timeline posts error:', error);
-    throw error;
-  }
-};
-
-// Fetch user by id
-export const fetchUserById = async (id) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/users/${id}`);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Failed to fetch user');
-    return data;
-  } catch (error) {
-    console.error('Fetch user by id error:', error);
-    throw error;
-  }
-};
-
-// Fetch single timeline post by id
-export const fetchPostById = async (id) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/timeline-posts/${id}`);
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Failed to fetch post');
-    return data;
-  } catch (error) {
-    console.error('Fetch post by id error:', error);
-    throw error;
-  }
-};
-
 // Create a new campaign
 export const postCampaign = async (campaignData) => {
   try {
@@ -183,6 +162,35 @@ export const postCampaign = async (campaignData) => {
   }
 };
 
+// --- TIMELINE POSTS ---
+
+// Fetch timeline posts
+export const fetchTimelinePosts = async (campaignId = null) => {
+  try {
+    const url = campaignId ? `${API_BASE_URL}/timeline-posts?campaign_id=${encodeURIComponent(campaignId)}` : `${API_BASE_URL}/timeline-posts`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch timeline posts');
+    return data;
+  } catch (error) {
+    console.error('Fetch timeline posts error:', error);
+    throw error;
+  }
+};
+
+// Fetch single timeline post by id
+export const fetchPostById = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/timeline-posts/${id}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch post');
+    return data;
+  } catch (error) {
+    console.error('Fetch post by id error:', error);
+    throw error;
+  }
+};
+
 // Create a new timeline post
 export const createTimelinePost = async (postData) => {
   try {
@@ -198,6 +206,85 @@ export const createTimelinePost = async (postData) => {
     return data;
   } catch (error) {
     console.error('Create timeline post error:', error);
+    throw error;
+  }
+};
+
+// --- COMMENTS ---
+
+// Fetch comments by post_id
+export const fetchCommentsByPostId = async (postId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/comments/post/${postId}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch comments');
+    return data;
+  } catch (error) {
+    console.error('Fetch comments by post id error:', error);
+    throw error;
+  }
+};
+
+// Create comment
+export const createComment = async (postId, userId, content) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        post_id: postId,
+        user_id: userId,
+        content: content
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to create comment');
+    return data;
+  } catch (error) {
+    console.error('Create comment error:', error);
+    throw error;
+  }
+};
+
+// Delete comment
+export const deleteComment = async (commentId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to delete comment');
+    return data;
+  } catch (error) {
+    console.error('Delete comment error:', error);
+    throw error;
+  }
+};
+
+// --- DONATIONS ---
+
+// Create a donation
+export const createDonation = async (donationData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/donations`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(donationData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to create donation');
+    return data;
+  } catch (error) {
+    console.error('Create donation error:', error);
     throw error;
   }
 };

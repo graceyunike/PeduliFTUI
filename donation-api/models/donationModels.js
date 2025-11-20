@@ -9,7 +9,7 @@ const donationSchema = new mongoose.Schema({
     },
     donor_id: {
         type: String,
-        required: true
+        required: false
     },
     campaign_id: {
         type: String,
@@ -21,6 +21,11 @@ const donationSchema = new mongoose.Schema({
     },
     message: {
         type: String
+    }
+    ,
+    anonymous: {
+        type: Boolean,
+        default: false
     }
     }, {
     timestamps: true
