@@ -163,3 +163,59 @@ export const fetchPostById = async (id) => {
     throw error;
   }
 };
+
+// Fetch comments by post_id
+export const fetchCommentsByPostId = async (postId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/comments/post/${postId}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch comments');
+    return data;
+  } catch (error) {
+    console.error('Fetch comments by post id error:', error);
+    throw error;
+  }
+};
+
+// Create comment
+export const createComment = async (postId, userId, content) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        post_id: postId,
+        user_id: userId,
+        content: content
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to create comment');
+    return data;
+  } catch (error) {
+    console.error('Create comment error:', error);
+    throw error;
+  }
+};
+
+// Delete comment
+export const deleteComment = async (commentId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to delete comment');
+    return data;
+  } catch (error) {
+    console.error('Delete comment error:', error);
+    throw error;
+  }
+};
