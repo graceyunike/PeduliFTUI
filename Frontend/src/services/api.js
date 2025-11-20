@@ -210,8 +210,11 @@ export const createTimelinePost = async (postData) => {
   }
 };
 
+<<<<<<< HEAD
 // --- COMMENTS ---
 
+=======
+>>>>>>> 487737f5a4dec6fbb9b00e7b629aead7908b1ff6
 // Fetch comments by post_id
 export const fetchCommentsByPostId = async (postId) => {
   try {
@@ -267,6 +270,7 @@ export const deleteComment = async (commentId) => {
     throw error;
   }
 };
+<<<<<<< HEAD
 
 // --- DONATIONS ---
 
@@ -288,3 +292,5 @@ export const createDonation = async (donationData) => {
     throw error;
   }
 };
+=======
+>>>>>>> 487737f5a4dec6fbb9b00e7b629aead7908b1ff6
