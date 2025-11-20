@@ -163,3 +163,41 @@ export const fetchPostById = async (id) => {
     throw error;
   }
 };
+
+// Create a new campaign
+export const postCampaign = async (campaignData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/campaigns`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(campaignData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to create campaign');
+    return data;
+  } catch (error) {
+    console.error('Post campaign error:', error);
+    throw error;
+  }
+};
+
+// Create a new timeline post
+export const createTimelinePost = async (postData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/timeline-posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to create timeline post');
+    return data;
+  } catch (error) {
+    console.error('Create timeline post error:', error);
+    throw error;
+  }
+};
