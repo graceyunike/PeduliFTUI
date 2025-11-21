@@ -14,13 +14,11 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Landing Page */}
-        <Route path="/" element={<LandingPage />} />
-
         {/* Auth */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
-
+        {/* Landing Page */}
+        <Route path="/" element={<LandingPage />} />
         {/* Event */}
         <Route path="/event-campaign" element={<EventCampaignPage />} />
         <Route path="/event-detail/:id" element={<EventDetailPage />} />

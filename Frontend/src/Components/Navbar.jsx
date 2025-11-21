@@ -7,19 +7,21 @@ export default function Navbar() {
             <div className="max-w-[1280px] mx-auto flex items-center justify-between h-[70px] px-6">
 
                 {/* LEFT — LOGO */}
-                <Link to="/" className="flex items-center">
+                <NavLink
+                    to="/" className="flex items-center"
+                >
                     <img 
                         src={Logo}
                         alt="PeduliFTUI Logo"
                         className="h-[48px] w-auto"
                     />
-                </Link>
+                </NavLink>
 
                 {/* CENTER — MENU */}
                 <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 gap-10 text-white font-semibold text-[17px]">
 
                     <NavLink
-                        to="/"
+                        to="/landingpage"
                         className={({ isActive }) =>
                             isActive ? "text-[#005384]" : "hover:text-[#003d63]"
                         }
@@ -28,7 +30,7 @@ export default function Navbar() {
                     </NavLink>
 
                     <NavLink
-                        to="/about"
+                        to="/landingpage"
                         className={({ isActive }) =>
                             isActive ? "text-[#005384]" : "hover:text-[#003d63]"
                         }
@@ -78,10 +80,9 @@ export default function Navbar() {
 
             </div>
 
-            {/* MOBILE (tanpa hamburger dulu) */}
             <div className="md:hidden flex flex-wrap justify-center gap-5 py-3 text-white font-semibold text-[16px] bg-[#13A3B5]">
-                <NavLink to="/" className="hover:text-[#003d63]">Home</NavLink>
-                <NavLink to="/about" className="hover:text-[#003d63]">About</NavLink>
+                <NavLink to="/landingpage" className="hover:text-[#003d63]">Home</NavLink>
+                <NavLink to="/landingpage" className="hover:text-[#003d63]">About</NavLink>
                 <NavLink to="/event-campaign" className="hover:text-[#003d63]">Event Campaign</NavLink>
                 <NavLink to="/sentiments" className="hover:text-[#003d63]">Sentiments</NavLink>
                 <NavLink to="/contact" className="hover:text-[#003d63]">Contact</NavLink>
