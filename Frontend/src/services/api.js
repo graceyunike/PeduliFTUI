@@ -1,8 +1,6 @@
 // API Configuration
 const API_BASE_URL = 'http://localhost:3000';
 
-// --- AUTHENTICATION ---
-
 // Login API call
 export const loginUser = async (email, password) => {
   try {
@@ -86,8 +84,6 @@ export const getToken = () => {
 export const isAuthenticated = () => {
   return !!getToken();
 };
-
-// --- USER DATA ---
 
 // Fetch all users
 export const fetchUsers = async () => {
@@ -262,6 +258,19 @@ export const deleteComment = async (commentId) => {
     return data;
   } catch (error) {
     console.error('Delete comment error:', error);
+    throw error;
+  }
+};
+
+// Get trust statistics
+export const getTrustStats = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/comments/trust/stats`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Failed to fetch trust stats');
+    return data;
+  } catch (error) {
+    console.error('Fetch trust stats error:', error);
     throw error;
   }
 };

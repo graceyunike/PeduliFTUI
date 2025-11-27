@@ -15,9 +15,24 @@ const commentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    user_name: {
+        type: String,
+        default: 'Anonymous User'
+    },
     content: {
         type: String,
         required: true
+    },
+    sentiment: {
+        type: String,
+        enum: ['trusted', 'untrusted', 'pending'],
+        default: 'pending'
+    },
+    sentiment_score: {
+        type: Number,
+        min: 0,
+        max: 1,
+        default: null
     }
     }, {
     timestamps: true

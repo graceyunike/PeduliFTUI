@@ -108,7 +108,7 @@ const PostDetailPage = () => {
       setSubmittingComment(true);
       
       const currentUser = getCurrentUser();
-      const userId = currentUser?.id || 'anonymous-user';
+      const userId = currentUser?.user_id || 'anonymous-user';
       // postId is UUID string, use directly without parseInt
 
       // Post comment ke API
@@ -236,12 +236,12 @@ const PostDetailPage = () => {
                       <div key={comment.comment_id || comment.id} className="p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-start gap-2">
                           <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">
-                            {(comment.user_id || 'Anonymous').charAt(0).toUpperCase()}
+                            {(comment.user_name || 'Anonymous User').charAt(0).toUpperCase()}
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
                               <span className="font-semibold text-sm text-[#13A3B5]">
-                                {comment.user_id || 'Anonymous User'}
+                                {comment.user_name || 'Anonymous User'}
                               </span>
                               <span className="text-xs text-gray-400">
                                 {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString('id-ID') : ''}
