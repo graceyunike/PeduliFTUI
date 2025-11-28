@@ -187,11 +187,11 @@ const LandingPage = () => {
                                 </p>
                             </div>
 
-                            <div className="pt-4">
+                            {/* <div className="pt-4">
                                 <button className="px-8 py-3 bg-gradient-to-r from-[#A2FF59] to-[#13A3B5] text-white font-semibold rounded-lg hover:shadow-lg transition-all">
                                     Learn More
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

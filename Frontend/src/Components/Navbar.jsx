@@ -62,7 +62,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-6 text-white font-semibold text-[17px]">
 
                     <Link
-                        to="/donate"
+                        to="/login"
                         className="bg-white text-[#005384] px-5 py-2 rounded-xl font-bold shadow hover:bg-[#f5f5f5] transition"
                     >
                         Donate
