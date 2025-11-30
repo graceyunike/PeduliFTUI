@@ -72,7 +72,7 @@ const LandingPage = () => {
             </div>
 
             {/* ========================= ABOUT US SECTION ========================= */}
-            <div className="w-full bg-white py-24 px-6 flex justify-center">
+            <div id="about-section" className="w-full bg-white py-24 px-6 flex justify-center">
                 <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16">
 
                     {/* LEFT TEXT */}
@@ -126,7 +126,7 @@ const LandingPage = () => {
             </div>
 
             {/* ========================= TRUST SECTION ========================= */}
-            <div className="w-full bg-gradient-to-b from-[#F0FFFE] to-white py-24 px-6 flex justify-center">
+            <div id="sentiments-section" className="w-full bg-gradient-to-b from-[#F0FFFE] to-white py-24 px-6 flex justify-center">
                 <div className="max-w-6xl w-full">
                     <div className="text-center mb-16">
                         <div className="flex items-center justify-center gap-3 mb-3">

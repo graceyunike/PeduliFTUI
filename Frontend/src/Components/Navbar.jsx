@@ -45,12 +45,17 @@ export default function Navbar() {
                         Home
                     </NavLink>
 
-                    <NavLink
-                        to="/#about"
+                    <Link
+                        to="/"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            const element = document.getElementById('about-section');
+                            element?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         className="hover:text-[#E0E0E0] transition"
                     >
                         About
-                    </NavLink>
+                    </Link>
 
                     <NavLink
                         to="/event-campaign"
@@ -61,12 +66,17 @@ export default function Navbar() {
                         Event Campaign
                     </NavLink>
 
-                    <a
-                        href="#sentiments"
+                    <Link
+                        to="/"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            const element = document.getElementById('sentiments-section');
+                            element?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         className="hover:text-[#E0E0E0] transition"
                     >
                         Sentiments
-                    </a>
+                    </Link>
 
                 </div>
 
@@ -114,9 +124,25 @@ export default function Navbar() {
             {/* MOBILE MENU */}
             <div className="md:hidden flex flex-wrap justify-center gap-3 py-3 text-white font-semibold text-[14px] bg-[#13A3B5]">
                 <NavLink to="/" className="hover:text-[#FFD700] transition">Home</NavLink>
-                <a href="#about" className="hover:text-[#FFD700] transition">About</a>
+                <Link 
+                    to="/"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        const element = document.getElementById('about-section');
+                        element?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="hover:text-[#FFD700] transition"
+                >About</Link>
                 <NavLink to="/event-campaign" className="hover:text-[#FFD700] transition">Campaign</NavLink>
-                <a href="#sentiments" className="hover:text-[#FFD700] transition">Sentiments</a>
+                <Link
+                    to="/"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        const element = document.getElementById('sentiments-section');
+                        element?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="hover:text-[#FFD700] transition"
+                >Sentiments</Link>
                 
                 {user && (
                     <>
