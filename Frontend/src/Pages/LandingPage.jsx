@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Components/Navbar.jsx";
 import Footer from "../Components/Footer.jsx";
 import TrustGauge from "../Components/TrustGauge.jsx";
-import { getTrustStats } from "../services/api.js";
+import { getTrustStats, fetchCampaigns } from "../services/api.js";
 
 import logo from "../assets/logo.svg";
 import homepageKiri from "../assets/homepagekiri.svg";
@@ -14,6 +14,9 @@ const LandingPage = () => {
     const [trustPercentage, setTrustPercentage] = useState(0);
     const [trustStats, setTrustStats] = useState(null);
     const [loadingTrust, setLoadingTrust] = useState(true);
+    
+    const [latestCampaign, setLatestCampaign] = useState(null);
+    const [loadingCampaign, setLoadingCampaign] = useState(true);
 
     useEffect(() => {
         const fetchTrustStats = async () => {
@@ -23,22 +26,62 @@ const LandingPage = () => {
                 setTrustPercentage(stats.trustPercentage || 0);
             } catch (error) {
                 console.error('Failed to fetch trust stats:', error);
-                // Set default value if fetch fails
                 setTrustPercentage(85);
             } finally {
                 setLoadingTrust(false);
             }
         };
 
-        // Fetch immediately on mount
         fetchTrustStats();
-
-        // Set up polling every 10 seconds to refresh trust stats
         const interval = setInterval(fetchTrustStats, 10000);
-
-        // Cleanup interval on component unmount
         return () => clearInterval(interval);
     }, []);
+
+    // Fetch latest campaign
+    useEffect(() => {
+        let mounted = true;
+        const loadLatestCampaign = async () => {
+            setLoadingCampaign(true);
+            try {
+                const campaigns = await fetchCampaigns();
+                if (campaigns && campaigns.length > 0) {
+                    // Sort by createdAt descending to get latest
+                    const sorted = campaigns.sort((a, b) => {
+                        const dateA = new Date(a.createdAt || 0);
+                        const dateB = new Date(b.createdAt || 0);
+                        return dateB - dateA;
+                    });
+                    
+                    const latest = sorted[0];
+                    if (mounted) {
+                        setLatestCampaign({
+                            campaign_id: latest.campaign_id,
+                            title: latest.title,
+                            description: latest.description,
+                            picture: latest.image_url || latest.picture || '',
+                            goal_amount: latest.goal_amount || 0,
+                            collected_amount: latest.collected_amount || 0,
+                            deadline: latest.deadline || latest.createdAt
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch latest campaign:', error);
+            } finally {
+                if (mounted) setLoadingCampaign(false);
+            }
+        };
+
+        loadLatestCampaign();
+        return () => { mounted = false; };
+    }, []);
+
+    // Helper function to calculate percentage
+    const calculatePercentage = (collected, goal) => {
+        if (goal === 0) return 0;
+        return Math.round((collected / goal) * 100);
+    };
+
     return (
         <div className="animate-fadeUp">
             <Navbar />
@@ -125,6 +168,99 @@ const LandingPage = () => {
                 </div>
             </div>
 
+            {/* ========================= EVENT CAMPAIGN SECTION ========================= */}
+            <div id="event-campaign-section" className="w-full bg-white py-24 px-6 flex justify-center">
+                <div className="max-w-6xl w-full">
+                    
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-12">
+                        <h2 className="text-3xl md:text-4xl font-bold text-primary">
+                            Events Campaign
+                        </h2>
+                        <a 
+                            href="/event-campaign" 
+                            className="text-primary font-semibold hover:underline text-lg"
+                        >
+                            View All
+                        </a>
+                    </div>
+
+                    {/* Campaign Content */}
+                    {loadingCampaign ? (
+                        <div className="flex items-center justify-center py-20">
+                            <div className="w-12 h-12 border-4 border-t-transparent border-primary rounded-full animate-spin" />
+                        </div>
+                    ) : latestCampaign ? (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                            
+                            {/* LEFT - CAMPAIGN IMAGE */}
+                            <div className="flex justify-center">
+                                <img 
+                                    src={latestCampaign.picture}
+                                    alt={latestCampaign.title}
+                                    className="w-full max-w-md h-auto object-cover rounded-xl shadow-lg"
+                                />
+                            </div>
+
+                            {/* RIGHT - CAMPAIGN INFO */}
+                            <div className="space-y-6">
+                                
+                                {/* Title */}
+                                <h3 className="text-2xl md:text-3xl font-bold text-primary">
+                                    {latestCampaign.title}
+                                </h3>
+
+                                {/* Description */}
+                                <p className="text-gray-700 leading-relaxed text-justify">
+                                    {latestCampaign.description.length > 200
+                                        ? latestCampaign.description.substring(0, 200) + "..."
+                                        : latestCampaign.description}
+                                </p>
+
+                                {/* Progress Bar */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm font-semibold text-gray-700">
+                                            {calculatePercentage(latestCampaign.collected_amount, latestCampaign.goal_amount)}%
+                                        </span>
+                                        <span className="text-sm font-semibold text-gray-700">
+                                            Goals 100%
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-gray-300 rounded-full h-3">
+                                        <div 
+                                            className="h-3 rounded-full transition-all duration-500"
+                                            style={{
+                                                width: `${calculatePercentage(latestCampaign.collected_amount, latestCampaign.goal_amount)}%`,
+                                                background: 'linear-gradient(90deg, #A2FF59 0%, #13A3B5 100%)'
+                                            }}
+                                        ></div>
+                                    </div>
+                                    <p className="text-sm text-gray-600">
+                                        Terkumpul: Rp {latestCampaign.collected_amount.toLocaleString('id-ID')}
+                                    </p>
+                                </div>
+
+                                {/* Donate Button */}
+                                <a 
+                                    href={`/event-detail/${latestCampaign.campaign_id}`}
+                                    className="inline-block bg-gradient-to-r from-[#A2FF59] to-[#13A3B5] text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+                                >
+                                    View Campaign
+                                </a>
+
+                            </div>
+
+                        </div>
+                    ) : (
+                        <div className="text-center py-10 text-gray-500">
+                            Tidak ada campaign yang tersedia
+                        </div>
+                    )}
+
+                </div>
+            </div>
+
             {/* ========================= TRUST SECTION ========================= */}
             <div id="sentiments-section" className="w-full bg-gradient-to-b from-[#F0FFFE] to-white py-24 px-6 flex justify-center">
                 <div className="max-w-6xl w-full">
@@ -186,12 +322,6 @@ const LandingPage = () => {
                                     Setiap campaign selalu diperbarui secara berkala sehingga donatur akan mendapatkan informasi yang tersentralisasi di platform kami, relevan, akurat, dan terpercaya
                                 </p>
                             </div>
-
-                            {/* <div className="pt-4">
-                                <button className="px-8 py-3 bg-gradient-to-r from-[#A2FF59] to-[#13A3B5] text-white font-semibold rounded-lg hover:shadow-lg transition-all">
-                                    Learn More
-                                </button>
-                            </div> */}
                         </div>
                     </div>
                 </div>

@@ -57,14 +57,19 @@ export default function Navbar() {
                         About
                     </Link>
 
-                    <NavLink
-                        to="/event-campaign"
+                    <Link
+                        to="/"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            const element = document.getElementById('event-campaign-section');
+                            element?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         className={({ isActive }) =>
                             isActive ? "text-[#FFD700] underline" : "hover:text-[#E0E0E0] transition"
                         }
                     >
                         Event Campaign
-                    </NavLink>
+                    </Link>
 
                     <Link
                         to="/"
@@ -133,7 +138,15 @@ export default function Navbar() {
                     }}
                     className="hover:text-[#FFD700] transition"
                 >About</Link>
-                <NavLink to="/event-campaign" className="hover:text-[#FFD700] transition">Campaign</NavLink>
+                <Link
+                    to="/"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        const element = document.getElementById('event-campaign-section');
+                        element?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="hover:text-[#FFD700] transition"
+                >Campaign</Link>
                 <Link
                     to="/"
                     onClick={(e) => {
