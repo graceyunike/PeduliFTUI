@@ -1,4 +1,5 @@
 import User from '../models/userModels.js';
+import bcrypt from 'bcrypt';
 
 const getUsers = async (req, res) => {
     try{
@@ -108,5 +109,38 @@ catch (error) {
 }
 };
 
+const changePassword = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { currentPassword, newPassword } = req.body;
 
-export { getUsers, getUserById, createUser, updateUser, deleteUser };
+        // Validasi input
+        if (!currentPassword || !newPassword) {
+            return res.status(400).json({ error: 'Current password dan new password harus diisi' });
+        }
+
+        // Cari user
+        const user = await User.findOne({ user_id: id });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Validasi current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Password saat ini tidak sesuai' });
+        }
+
+        // Update password (akan di-hash otomatis oleh virtual setter)
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({ message: 'Password berhasil diubah' });
+    } catch (error) {
+        console.error('Change password error:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+export { getUsers, getUserById, createUser, updateUser, deleteUser, changePassword };

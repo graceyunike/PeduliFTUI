@@ -14,7 +14,7 @@
 /* Header */
 .dashboard-header {
     background: white;
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 2rem;
     margin-bottom: 2rem;
     box-shadow: 0 4px 6px rgba(0, 83, 132, 0.1);
@@ -56,7 +56,7 @@
 /* Sidebar */
 .dashboard-sidebar {
     background: white;
-    border-radius: 15px;
+    border-radius: 24px;
     padding: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 83, 132, 0.1);
     height: fit-content;
@@ -118,7 +118,7 @@
 /* Content Area */
 .dashboard-content {
     background: white;
-    border-radius: 20px;
+    border-radius: 24px;
     padding: 2rem;
     box-shadow: 0 4px 6px rgba(0, 83, 132, 0.1);
 }
@@ -168,14 +168,16 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #f1f5f9;
+    padding: 1rem 1.25rem; /* add padding so rounded background is visible */
+    border-radius: 14px; /* rounded corners */
+    background: linear-gradient(135deg, rgba(0,83,132,0.08) 0%, rgba(19,163,181,0.06) 100%);
+    border: 2px dashed rgba(3, 105, 135, 0.12);
 }
 
 .section-header h2 {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #e9e9e9;
+    color: #003d63; /* darker title to contrast with light gradient */
     margin: 0;
 }
 
@@ -404,7 +406,7 @@
 
 .donation-card {
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 20px;
     padding: 1.5rem;
     border: 2px solid #e2e8f0;
     transition: all 0.3s ease;
@@ -421,12 +423,13 @@
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
+    border-radius: 14px;
     border-bottom: 1px solid #e2e8f0;
 }
 
 .donation-id {
     font-family: monospace;
-    color: #374151;
+    color: #c6cedb;
     font-size: 0.875rem;
     font-weight: 600;
 }

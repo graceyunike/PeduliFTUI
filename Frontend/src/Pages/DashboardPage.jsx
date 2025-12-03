@@ -6,7 +6,7 @@ import { fetchCampaigns, getCurrentUser, postCampaign, createTimelinePost } from
 const DashboardPage = () => {
     const [campaigns, setCampaigns] = useState([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const [modalType, setModalType] = useState(''); // 'campaign' or 'post'
+    const [modalType, setModalType] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentUser, setCurrentUser] = useState(null);
@@ -152,13 +152,13 @@ const DashboardPage = () => {
     return (
         <div className="dashboard-page">
             <Navbar />
-            
+
             <div className="dashboard-container">
                 <div className="max-w-7xl mx-auto py-8 px-4">
                     {/* Header Section */}
                     <div className="dashboard-header">
                         <h1 className="dashboard-title">
-                            Dashboard Organisasi
+                            Halo, {currentUser ? currentUser.name : "Sosma"}
                         </h1>
                         <p className="dashboard-subtitle">Kelola campaign dan postingan donasi Anda</p>
 
@@ -202,7 +202,7 @@ const DashboardPage = () => {
                     {/* Campaign List Section */}
                     <div className="campaign-section">
                         <div className="section-header">
-                            <h2 className="section-title">Campaign Donasi Saya</h2>
+                            <h2 className="section-title gradient-text">Campaign Donasi Saya</h2>
                             <p className="section-subtitle">Daftar campaign yang telah dibuat oleh {currentUser ? currentUser.name : 'organisasi Anda'}</p>
                         </div>
 

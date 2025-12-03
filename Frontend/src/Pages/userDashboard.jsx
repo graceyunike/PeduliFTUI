@@ -81,28 +81,11 @@ const UserDashboard = () => {
                 return;
             }
 
-            // Validasi password jika diubah
-            if (formData.newPassword) {
-                if (formData.newPassword.length < 6) {
-                    setMessage({ type: 'error', text: 'Password baru minimal 6 karakter' });
-                    return;
-                }
-                if (formData.newPassword !== formData.confirmPassword) {
-                    setMessage({ type: 'error', text: 'Konfirmasi password tidak cocok' });
-                    return;
-                }
-            }
-
             const updatePayload = {
                 name: formData.name,
                 email: formData.email,
                 profile_picture: formData.profile_picture || ''
             };
-
-            // Jika password diubah, tambahkan ke payload
-            if (formData.newPassword) {
-                updatePayload.password = formData.newPassword;
-            }
 
             const updatedUser = await updateUser(user.user_id, updatePayload);
             setUser(updatedUser);
@@ -121,6 +104,59 @@ const UserDashboard = () => {
 
             setEditMode(false);
             setMessage({ type: 'success', text: 'Profil berhasil diperbarui!' });
+        } catch (err) {
+            setMessage({ type: 'error', text: err.message || 'Gagal memperbarui profil' });
+        }
+    };
+
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        setMessage({ type: '', text: '' });
+
+        try {
+            // Validasi semua field terisi
+            if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
+                setMessage({ type: 'error', text: 'Semua field password harus diisi' });
+                return;
+            }
+
+            // Validasi password baru minimal 6 karakter
+            if (formData.newPassword.length < 6) {
+                setMessage({ type: 'error', text: 'Password baru minimal 6 karakter' });
+                return;
+            }
+
+            // Validasi password baru dan konfirmasi cocok
+            if (formData.newPassword !== formData.confirmPassword) {
+                setMessage({ type: 'error', text: 'Password baru dan konfirmasi tidak cocok' });
+                return;
+            }
+
+            // Validasi bahwa password baru berbeda dengan current password
+            if (formData.currentPassword === formData.newPassword) {
+                setMessage({ type: 'error', text: 'Password baru harus berbeda dengan password saat ini' });
+                return;
+            }
+
+            // Call backend API to change password (will validate current password)
+            const currentUser = getCurrentUser();
+            const response = await fetch(`http://localhost:3000/users/${currentUser.user_id}/change-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    currentPassword: formData.currentPassword,
+                    newPassword: formData.newPassword
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Gagal mengubah password');
+            }
+
+            setMessage({ type: 'success', text: 'Password berhasil diubah!' });
             
             // Reset password fields
             setFormData(prev => ({
@@ -130,11 +166,10 @@ const UserDashboard = () => {
                 confirmPassword: ''
             }));
         } catch (err) {
-            setMessage({ type: 'error', text: err.message || 'Gagal memperbarui profil' });
+            setMessage({ type: 'error', text: err.message || 'Gagal mengubah password' });
         }
     };
 
-    // Helper function untuk validasi URL
     const isValidUrl = (urlString) => {
         try {
             const url = new URL(urlString);
@@ -468,7 +503,7 @@ const UserDashboard = () => {
                                         <button 
                                             type="button" 
                                             className="save-btn"
-                                            onClick={handleProfileUpdate}
+                                            onClick={handlePasswordChange}
                                         >
                                             Ubah Password
                                         </button>
