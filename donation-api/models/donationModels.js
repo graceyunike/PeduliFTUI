@@ -21,15 +21,14 @@ const donationSchema = new mongoose.Schema({
     },
     message: {
         type: String
-    }
-    ,
+    },
     anonymous: {
         type: Boolean,
         default: false
     }
-    }, {
+}, {
     timestamps: true
-    });
+});
 
 const Donation = mongoose.model('Donation', donationSchema);
 export default Donation;

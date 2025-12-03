@@ -73,49 +73,8 @@ const PaymentPage = () => {
         return () => { mounted = false; };
     }, [campaignId]);
 
-    const handleSubmit = async () => {
-        try {
-            const user = getCurrentUser();
-            if (!user) throw new Error('User must be logged in to donate');
-            if (!campaign) throw new Error('No campaign selected');
-
-            const donationAmount = Number(String(amount).replace(/[^0-9.-]+/g, ''));
-            if (!donationAmount || donationAmount <= 0) {
-                throw new Error('Masukkan jumlah donasi yang valid');
-            }
-
-            const donationPayload = {
-                campaign_id: campaign.campaign_id,
-                amount: donationAmount,
-                message: message || ''
-            };
-
-            if (!isAnonymous) {
-                donationPayload.donor_id = user.user_id;
-            }
-
-            // always include explicit anonymous flag so backend can record intent
-            donationPayload.anonymous = !!isAnonymous;
-
-            await createDonation(donationPayload);
-
-            // Refresh campaign data to update collected amount
-            const refreshedCampaign = await fetchCampaignById(campaign.campaign_id);
-            setCampaign(prev => ({
-                ...prev,
-                collected_amount: refreshedCampaign.collected_amount || prev.collected_amount
-            }));
-
-            alert('Donasi berhasil. Terima kasih!');
-            navigate('/');
-        } catch (err) {
-            console.error('Donation failed', err);
-            alert(err.message || 'Gagal mengirim donasi');
-        }
-    };
-
     const handlePayNow = async () => {
-        const user = getCurrentUser();   // <= FIX
+        const user = getCurrentUser();   
 
         if (!user) {
             alert("Anda harus login terlebih dahulu");
@@ -136,8 +95,10 @@ const PaymentPage = () => {
                 body: JSON.stringify({
                     order_id: orderId,
                     amount: Number(amount),
-                    donor_name: user.name || "Anonymous",   // <= FIX
-                    donor_email: user.email || "noemail@example.com",   // <= FIX
+                    donor_name: user.name || "Anonymous",
+                    donor_email: user.email || "noemail@example.com",
+                    user_id: user.user_id,
+                    campaign_id: campaignId,
                 })
             });
 
@@ -153,8 +114,8 @@ const PaymentPage = () => {
                     await createDonation({
                         donation_id: orderId,
                         campaign_id: campaignId,
-                        user_id: user.user_id,  // <= FIX
-                        user_name: isAnonymous ? "Anonymous" : user.name,  // <= FIX
+                        donor_id: user.user_id,
+                        donor_name: isAnonymous ? "Anonymous" : user.name,
                         message,
                         amount: Number(amount),
                         anonymous: isAnonymous,

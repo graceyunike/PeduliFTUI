@@ -1,13 +1,24 @@
 /* DashboardPage.css */
-.dashboard-container {
+.dashboard-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Header Section */
 .dashboard-header {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 83, 132, 0.1);
     text-align: center;
-    margin-bottom: 3rem;
 }
 
 .dashboard-title {
@@ -23,13 +34,14 @@
 .dashboard-subtitle {
     color: #6b7280;
     font-size: 1.1rem;
+    margin-bottom: 1.5rem;
 }
 
 .action-buttons {
     display: flex;
     justify-content: center;
     gap: 1rem;
-    margin: 2rem 0;
+    margin-top: 2rem;
 }
 
 .btn-primary {
@@ -42,6 +54,9 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 83, 132, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-primary:hover {
@@ -59,6 +74,9 @@
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(19, 163, 181, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-secondary:hover {
@@ -66,6 +84,7 @@
     box-shadow: 0 6px 20px rgba(19, 163, 181, 0.4);
 }
 
+/* Stats Overview */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -81,7 +100,6 @@
     text-align: center;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
     transition: transform 0.3s ease;
 }
 
@@ -95,6 +113,7 @@
     margin: 0.5rem 0;
 }
 
+/* Campaign Section */
 .campaign-section {
     background: white;
     border-radius: 20px;

@@ -48,7 +48,8 @@ const login = async (req, res) => {
             user_id: user.user_id,
             name: user.name,
             email: user.email,
-            role: user.role
+            role: user.role,
+            profile_picture: user.profile_picture || ''
         }
         });
     } catch (error) {

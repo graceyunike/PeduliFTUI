@@ -295,3 +295,37 @@ export const createDonation = async (donationData) => {
         throw error;
     }
 };
+
+// Fetch donations by user ID
+export const fetchDonationsByUserId = async (userId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/donations/user/${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch donations');
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch donations by user error:', error);
+        throw error;
+    }
+};
+
+// Update user profile
+export const updateUser = async (userId, userData) => {
+    try {
+        const token = getToken();
+        const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            },
+            body: JSON.stringify(userData)
+        });
+        
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Failed to update user');
+        return data;
+    } catch (error) {
+        console.error('Update user error:', error);
+        throw error;
+    }
+};

@@ -9,6 +9,7 @@ import EventDetailPage from "./Pages/EventDetailPage";
 import DashboardPage from "./Pages/DashboardPage";
 import PaymentPage from "./Pages/PaymentPage";
 import PostDetailPage from "./Pages/PostDetailPage";
+import UserDashboard from "./Pages/userDashboard";
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/donate" element={<PaymentPage />} />
         <Route path="/post-detail/:postId" element={<PostDetailPage />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

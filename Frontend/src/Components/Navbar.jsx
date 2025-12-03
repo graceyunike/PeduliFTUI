@@ -20,6 +20,18 @@ export default function Navbar() {
         navigate("/");
     };
 
+    // Fungsi untuk menentukan dashboard berdasarkan role
+    const getUserDashboardLink = () => {
+        if (!user) return "/login";
+        
+        const role = user.role?.toLowerCase();
+        if (role === 'admin' || role === 'organizer') {
+            return "/dashboard"; // Dashboard admin/organizer
+        } else {
+            return "/user-dashboard"; // Dashboard untuk donor/regular user
+        }
+    };
+
     return (
         <nav className="sticky top-0 z-50 w-full bg-[#13A3B5]/90 backdrop-blur-md shadow-sm">
             <div className="max-w-[1280px] mx-auto flex items-center justify-between h-[70px] px-6">
@@ -64,9 +76,7 @@ export default function Navbar() {
                             const element = document.getElementById('event-campaign-section');
                             element?.scrollIntoView({ behavior: 'smooth' });
                         }}
-                        className={({ isActive }) =>
-                            isActive ? "text-[#FFD700] underline" : "hover:text-[#E0E0E0] transition"
-                        }
+                        className="hover:text-[#E0E0E0] transition"
                     >
                         Event Campaign
                     </Link>
@@ -90,10 +100,20 @@ export default function Navbar() {
 
                     {user ? (
                         <>
-                            {/* User Name Display */}
-                            <span className="hidden sm:inline text-white font-medium">
-                                {user.name || user.username || "User"}
-                            </span>
+                            {/* User Profile Picture and Name Display */}
+                            <Link
+                                to={getUserDashboardLink()}
+                                className="hidden sm:flex items-center gap-2 text-white font-medium hover:text-[#FFD700] transition"
+                            >
+                                {user.profile_picture && (
+                                    <img
+                                        src={user.profile_picture}
+                                        alt={user.name || "User"}
+                                        className="w-8 h-8 rounded-full object-cover border border-white"
+                                    />
+                                )}
+                                <span className="hover:underline">{user.name || user.username || "User"}</span>
+                            </Link>
 
                             {/* Logout Button */}
                             <button
@@ -159,7 +179,19 @@ export default function Navbar() {
                 
                 {user && (
                     <>
-                        <span className="w-full text-center text-sm">👤 {user.name || user.username}</span>
+                        <Link 
+                            to={getUserDashboardLink()}
+                            className="w-full flex items-center justify-center gap-2 text-sm hover:text-[#FFD700] hover:underline py-1"
+                        >
+                            {user.profile_picture && (
+                                <img
+                                    src={user.profile_picture}
+                                    alt={user.name || "User"}
+                                    className="w-6 h-6 rounded-full object-cover border border-white"
+                                />
+                            )}
+                            <span>{user.name || user.username} Dashboard</span>
+                        </Link>
                         <button
                             onClick={handleLogout}
                             className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg font-bold w-full transition-colors"
