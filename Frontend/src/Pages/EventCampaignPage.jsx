@@ -14,6 +14,11 @@ const EventCampaignPage = () => {
   const [loadingCampaigns, setLoadingCampaigns] = useState(false);
   const [campaignsError, setCampaignsError] = useState(null);
 
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     const loadData = async () => {

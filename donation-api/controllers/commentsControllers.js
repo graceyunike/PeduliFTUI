@@ -30,7 +30,28 @@ const getCommentsByPostId = async (req, res) => {
     try {
         const { postId } = req.params;
         const comments = await Comment.find({ post_id: postId }).sort({ createdAt: -1 });
-        res.status(200).json(comments);
+
+        // Fetch profile pictures for all commenters
+        const commentsWithProfiles = await Promise.all(
+            comments.map(async (comment) => {
+                const commentData = comment.toObject();
+                
+                if (comment.user_id) {
+                    try {
+                        const user = await User.findOne({ user_id: comment.user_id });
+                        if (user && user.profile_picture) {
+                            commentData.user_profile_picture = user.profile_picture;
+                        }
+                    } catch (userErr) {
+                        console.warn('Failed to fetch commenter profile:', userErr);
+                    }
+                }
+                
+                return commentData;
+            })
+        );
+
+        res.status(200).json(commentsWithProfiles);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

@@ -11,6 +11,14 @@ const donationSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    donor_name: {
+        type: String,
+        default: null
+    },
+    donor_profile_picture: {
+        type: String,
+        default: null
+    },
     campaign_id: {
         type: String,
         required: true

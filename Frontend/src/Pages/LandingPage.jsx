@@ -18,6 +18,11 @@ const LandingPage = () => {
     const [latestCampaign, setLatestCampaign] = useState(null);
     const [loadingCampaign, setLoadingCampaign] = useState(true);
 
+    // Scroll to top on page load
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     useEffect(() => {
         const fetchTrustStats = async () => {
             try {
@@ -175,7 +180,7 @@ const LandingPage = () => {
                     {/* Header */}
                     <div className="flex justify-between items-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold text-primary">
-                            Events Campaign
+                            Event Campaign
                         </h2>
                         <a 
                             href="/event-campaign" 
@@ -244,7 +249,7 @@ const LandingPage = () => {
                                 {/* Donate Button */}
                                 <a 
                                     href={`/event-detail/${latestCampaign.campaign_id}`}
-                                    className="inline-block bg-gradient-to-r from-[#A2FF59] to-[#13A3B5] text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+                                    className="inline-block bg-[#13A3B5] text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
                                 >
                                     View Campaign
                                 </a>

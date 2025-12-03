@@ -1,10 +1,16 @@
 import Donation from '../models/donationModels.js';
 import DonationCampaign from '../models/donationCampaignsModels.js';
 import OrderMapping from '../models/orderMappingModel.js';
+import User from '../models/userModels.js';
 
 const getDonations = async (req, res) => {
     try {
-        const donations = await Donation.find();
+        // Support filtering by campaign_id: GET /donations?campaign_id=<id>
+        const { campaign_id } = req.query;
+        const filter = {};
+        if (campaign_id) filter.campaign_id = campaign_id;
+
+        const donations = await Donation.find(filter).sort({ createdAt: -1 });
         res.status(200).json(donations);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -27,6 +33,22 @@ const createDonation = async (req, res) => {
         // Normalize possible user_id -> donor_id coming from different clients
         if (req.body.user_id && !req.body.donor_id) {
             req.body.donor_id = req.body.user_id;
+        }
+
+        // Fetch donor name and profile picture from User model if not anonymous
+        if (!req.body.anonymous && req.body.donor_id) {
+            try {
+                const user = await User.findOne({ user_id: req.body.donor_id });
+                if (user) {
+                    req.body.donor_name = user.name;
+                    if (user.profile_picture) {
+                        req.body.donor_profile_picture = user.profile_picture;
+                    }
+                }
+            } catch (userErr) {
+                console.warn('Failed to fetch user data for donor:', userErr.message);
+                // Continue even if user fetch fails
+            }
         }
 
         const donation = await Donation.create(req.body);

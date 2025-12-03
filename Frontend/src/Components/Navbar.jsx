@@ -1,9 +1,16 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import Logo from "../assets/logo.svg";
 
 export default function Navbar() {
     const navigate = useNavigate();
+    const [activeSection, setActiveSection] = useState('');
+    const location = useLocation();
+
+    if (location.pathname !== '/' && activeSection !== '') {
+        setActiveSection('');
+    }
+
     const [user, setUser] = useState(() => {
         try {
             const stored = localStorage.getItem("user");
@@ -20,24 +27,47 @@ export default function Navbar() {
         navigate("/");
     };
 
-    // Fungsi untuk menentukan dashboard berdasarkan role
+    const handleScrollToSection = (sectionId) => {
+        return (e) => {
+            e.preventDefault();
+            const element = document.getElementById(sectionId);
+            
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                navigate("/");
+                setTimeout(() => {
+                    const el = document.getElementById(sectionId);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }, 500);
+            }
+        };
+    };
+
     const getUserDashboardLink = () => {
         if (!user) return "/login";
-        
         const role = user.role?.toLowerCase();
-        if (role === 'admin' || role === 'organizer') {
-            return "/dashboard"; // Dashboard admin/organizer
-        } else {
-            return "/user-dashboard"; // Dashboard untuk donor/regular user
-        }
+        return (role === 'admin' || role === 'organizer') ? "/dashboard" : "/user-dashboard";
+    };
+
+    // Helper function untuk scroll ke paling atas
+    const handleScrollToTop = () => {
+        setActiveSection('');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (
         <nav className="sticky top-0 z-50 w-full bg-[#13A3B5]/90 backdrop-blur-md shadow-sm">
             <div className="max-w-[1280px] mx-auto flex items-center justify-between h-[70px] px-6">
 
-                {/* LEFT — LOGO */}
-                <NavLink to="/" className="flex items-center flex-shrink-0">
+                {/* LEFT — LOGO (Ditambahkan onClick scroll to top) */}
+                <NavLink 
+                    to="/" 
+                    className="flex items-center flex-shrink-0"
+                    onClick={handleScrollToTop} 
+                >
                     <img 
                         src={Logo}
                         alt="PeduliFTUI Logo"
@@ -45,13 +75,17 @@ export default function Navbar() {
                     />
                 </NavLink>
 
-                {/* CENTER — MENU (Hidden on mobile) */}
+                {/* CENTER — MENU */}
                 <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 gap-10 text-white font-semibold text-[17px]">
 
+                    {/* HOME (Ditambahkan scroll to top) */}
                     <NavLink
                         to="/"
+                        onClick={handleScrollToTop}
                         className={({ isActive }) =>
-                            isActive ? "text-[#FFD700] underline" : "hover:text-[#E0E0E0] transition"
+                            isActive && activeSection === '' 
+                            ? "text-[#FFD700]" 
+                            : "hover:text-[#FFD700] transition scale-105"
                         }
                     >
                         Home
@@ -60,47 +94,52 @@ export default function Navbar() {
                     <Link
                         to="/"
                         onClick={(e) => {
-                            e.preventDefault();
-                            const element = document.getElementById('about-section');
-                            element?.scrollIntoView({ behavior: 'smooth' });
+                            handleScrollToSection('about-section')(e);
+                            setActiveSection('about');
                         }}
-                        className="hover:text-[#E0E0E0] transition"
+                        className={activeSection === 'about' ? "text-[#FFD700]" : "hover:text-[#FFD700] transition"}
                     >
                         About
                     </Link>
 
-                    <Link
-                        to="/"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            const element = document.getElementById('event-campaign-section');
-                            element?.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className="hover:text-[#E0E0E0] transition"
+                    <NavLink
+                        to="/event-campaign"
+                        onClick={() => setActiveSection('')}
+                        className={({ isActive }) =>
+                            isActive ? "text-[#FFD700]" : "hover:text-[#FFD700] transition"
+                        }
                     >
                         Event Campaign
-                    </Link>
+                    </NavLink>
+
 
                     <Link
                         to="/"
                         onClick={(e) => {
-                            e.preventDefault();
-                            const element = document.getElementById('sentiments-section');
-                            element?.scrollIntoView({ behavior: 'smooth' });
+                            handleScrollToSection('sentiments-section')(e);
+                            setActiveSection('sentiments');
                         }}
-                        className="hover:text-[#E0E0E0] transition"
+                        className={activeSection === 'sentiments' ? "text-[#FFD700]" : "hover:text-[#FFD700] transition"}
                     >
                         Sentiments
                     </Link>
+
+                    <NavLink
+                        to="/timeline-posts"
+                        onClick={() => setActiveSection('')}
+                        className={({ isActive }) =>
+                            isActive ? "text-[#FFD700]" : "hover:text-[#FFD700] transition"
+                        }
+                    >
+                        Timeline
+                    </NavLink>
 
                 </div>
 
                 {/* RIGHT — AUTH SECTION */}
                 <div className="flex items-center gap-4 md:gap-6 text-white font-semibold text-sm md:text-[17px]">
-
                     {user ? (
                         <>
-                            {/* User Profile Picture and Name Display */}
                             <Link
                                 to={getUserDashboardLink()}
                                 className="hidden sm:flex items-center gap-2 text-white font-medium hover:text-[#FFD700] transition"
@@ -115,7 +154,6 @@ export default function Navbar() {
                                 <span className="hover:underline">{user.name || user.username || "User"}</span>
                             </Link>
 
-                            {/* Logout Button */}
                             <button
                                 onClick={handleLogout}
                                 className="bg-red-500 hover:bg-red-600 text-white px-4 md:px-5 py-2 rounded-xl font-bold shadow transition-colors"
@@ -125,7 +163,6 @@ export default function Navbar() {
                         </>
                     ) : (
                         <>
-                            {/* Login Link */}
                             <Link
                                 to="/login"
                                 className="text-white hover:text-[#FFD700] transition font-semibold"
@@ -133,7 +170,6 @@ export default function Navbar() {
                                 Login
                             </Link>
 
-                            {/* Donate Button */}
                             <Link
                                 to="/event-campaign"
                                 className="bg-white text-[#005384] px-4 md:px-5 py-2 rounded-xl font-bold shadow hover:bg-[#f5f5f5] transition"
@@ -143,45 +179,57 @@ export default function Navbar() {
                         </>
                     )}
                 </div>
-
             </div>
 
             {/* MOBILE MENU */}
             <div className="md:hidden flex flex-wrap justify-center gap-3 py-3 text-white font-semibold text-[14px] bg-[#13A3B5]">
-                <NavLink to="/" className="hover:text-[#FFD700] transition">Home</NavLink>
+                {/* Mobile Home juga ditambahkan scroll to top */}
+                <NavLink 
+                    to="/" 
+                    onClick={handleScrollToTop}
+                    className="hover:text-[#FFD700] transition"
+                >
+                    Home
+                </NavLink>
+                
                 <Link 
                     to="/"
                     onClick={(e) => {
-                        e.preventDefault();
-                        const element = document.getElementById('about-section');
-                        element?.scrollIntoView({ behavior: 'smooth' });
+                        handleScrollToSection('about-section')(e);
+                        setActiveSection('about');
                     }}
-                    className="hover:text-[#FFD700] transition"
+                    className={activeSection === 'about' ? "text-[#FFD700]" : "hover:text-[#FFD700] transition"}
                 >About</Link>
                 <Link
-                    to="/"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        const element = document.getElementById('event-campaign-section');
-                        element?.scrollIntoView({ behavior: 'smooth' });
-                    }}
+                    to="/event-campaign"
                     className="hover:text-[#FFD700] transition"
                 >Campaign</Link>
+
+
                 <Link
                     to="/"
                     onClick={(e) => {
-                        e.preventDefault();
-                        const element = document.getElementById('sentiments-section');
-                        element?.scrollIntoView({ behavior: 'smooth' });
+                        handleScrollToSection('sentiments-section')(e);
+                        setActiveSection('sentiments');
                     }}
-                    className="hover:text-[#FFD700] transition"
+                    className={activeSection === 'sentiments' ? "text-[#FFD700]" : "hover:text-[#FFD700] transition"}
                 >Sentiments</Link>
+
+                <NavLink
+                    to="/timeline-posts"
+                    onClick={() => setActiveSection('')}
+                    className={({ isActive }) =>
+                        isActive ? "text-[#FFD700]" : "hover:text-[#FFD700] transition"
+                    }
+                >
+                    Timeline
+                </NavLink>
                 
                 {user && (
                     <>
                         <Link 
                             to={getUserDashboardLink()}
-                            className="w-full flex items-center justify-center gap-2 text-sm hover:text-[#FFD700] hover:underline py-1"
+                            className="w-full flex items-center justify-center gap-2 text-sm hover:text-[#FFD700] py-1"
                         >
                             {user.profile_picture && (
                                 <img

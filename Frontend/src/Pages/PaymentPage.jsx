@@ -233,7 +233,7 @@ const PaymentPage = () => {
                             <div className="donation-card">
                                 <div className="donation-header">
                                     <h2 className="donation-title">Buat Donasi</h2>
-                                    <p className="donation-subtitle">Bantu wujudkan campaign ini</p>
+                                    {/* <p className="donation-subtitle">Bantu wujudkan campaign ini</p> */}
                                 </div>
 
                                 <div className="donation-form">
@@ -241,7 +241,7 @@ const PaymentPage = () => {
                                     <div className="form-group">
                                         <label className="form-label">Jumlah Donasi</label>
                                         <div className="amount-input-container">
-                                            <span className="currency-symbol">Rp</span>
+                                            {/* <span className="currency-symbol"></span> */}
                                             <input
                                                 className="donation-amount-input"
                                                 type="number"

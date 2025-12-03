@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../Components/Navbar.jsx';
-import { fetchCampaignById, fetchTimelinePosts, fetchUserById } from '../services/api';
+import DonationCarousel from '../Components/DonationCarousel.jsx';
+import { fetchCampaignById, fetchTimelinePosts, fetchUserById, fetchDonationsByCampaignId } from '../services/api';
 
 const EventDetailPage = () => {
     const navigate = useNavigate();
@@ -9,6 +10,7 @@ const EventDetailPage = () => {
     const [campaign, setCampaign] = useState(null);
     const [timeline, setTimeline] = useState([]);
     const [organizer, setOrganizer] = useState(null);
+    const [donations, setDonations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showFullDescription, setShowFullDescription] = useState(false);
@@ -24,6 +26,14 @@ const EventDetailPage = () => {
 
                 // Fetch timeline posts for this campaign (API supports ?campaign_id=...)
                 const filteredPosts = await fetchTimelinePosts(campaignData.campaign_id);
+
+                // Fetch donations for this campaign (with messages)
+                let donationsList = [];
+                try {
+                    donationsList = await fetchDonationsByCampaignId(campaignData.campaign_id);
+                } catch (donErr) {
+                    console.warn('Failed to fetch donations:', donErr);
+                }
 
                 // Fetch organizer (user) to get name and profile picture
                 let organizerName = 'Unknown';
@@ -53,6 +63,7 @@ const EventDetailPage = () => {
                     setCampaign(mappedCampaign);
                     setOrganizer(organizerObj);
                     setTimeline(filteredPosts.map(p => ({ post_id: p.post_id, content: p.content, media_url: p.media_url || p.image_url || '', user_id: p.user_id, created_by: p.created_by || null })));
+                    setDonations(donationsList);
                 }
             } catch (err) {
                 console.error('Failed to load event detail', err);
@@ -237,6 +248,11 @@ const EventDetailPage = () => {
                                 </div>
                             ))}
                         </div>
+
+                        {/* ===== DONATION CAROUSEL ===== */}
+                        {donations.length > 0 && (
+                            <DonationCarousel donations={donations} />
+                        )}
                     </div>
 
                 </div>

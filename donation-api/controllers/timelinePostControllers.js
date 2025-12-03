@@ -1,4 +1,5 @@
 import TimelinePost from '../models/timelinePostsModels.js';
+import User from '../models/userModels.js';
 
 const getPosts = async (req, res) => {
     try {
@@ -9,7 +10,41 @@ const getPosts = async (req, res) => {
 
         // Return posts sorted by newest first
         const posts = await TimelinePost.find(filter).sort({ createdAt: -1 });
-        res.status(200).json(posts);
+
+        // Fetch profile pictures for all creators
+        const postsWithProfiles = await Promise.all(
+            posts.map(async (post) => {
+                const postData = post.toObject();
+                
+                // Try to fetch profile picture using user_id first
+                if (post.user_id) {
+                    try {
+                        const user = await User.findOne({ user_id: post.user_id });
+                        if (user && user.profile_picture) {
+                            postData.creator_profile_picture = user.profile_picture;
+                        }
+                    } catch (userErr) {
+                        console.warn('Failed to fetch creator profile for user_id:', post.user_id);
+                    }
+                }
+                
+                // If not found by user_id, try fetching by created_by name
+                if (!postData.creator_profile_picture && post.created_by) {
+                    try {
+                        const user = await User.findOne({ name: post.created_by });
+                        if (user && user.profile_picture) {
+                            postData.creator_profile_picture = user.profile_picture;
+                        }
+                    } catch (userErr) {
+                        console.warn('Failed to fetch creator profile for name:', post.created_by);
+                    }
+                }
+                
+                return postData;
+            })
+        );
+
+        res.status(200).json(postsWithProfiles);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -20,7 +55,41 @@ const getPostById = async (req, res) => {
         const { id } = req.params;
         const post = await TimelinePost.findOne({ post_id: id });
         if (!post) return res.status(404).json({ error: 'Post not found' });
-        res.status(200).json(post);
+
+        // Fetch creator's profile picture from User model
+        let creatorProfilePicture = null;
+        
+        // Try to fetch by user_id first
+        if (post.user_id) {
+            try {
+                const user = await User.findOne({ user_id: post.user_id });
+                if (user && user.profile_picture) {
+                    creatorProfilePicture = user.profile_picture;
+                }
+            } catch (userErr) {
+                console.warn('Failed to fetch creator profile by user_id:', post.user_id);
+            }
+        }
+        
+        // If not found by user_id, try fetching by created_by name
+        if (!creatorProfilePicture && post.created_by) {
+            try {
+                const user = await User.findOne({ name: post.created_by });
+                if (user && user.profile_picture) {
+                    creatorProfilePicture = user.profile_picture;
+                }
+            } catch (userErr) {
+                console.warn('Failed to fetch creator profile by name:', post.created_by);
+            }
+        }
+
+        // Add profile picture to response if found
+        const postData = post.toObject();
+        if (creatorProfilePicture) {
+            postData.creator_profile_picture = creatorProfilePicture;
+        }
+
+        res.status(200).json(postData);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

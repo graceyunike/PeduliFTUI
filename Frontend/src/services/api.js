@@ -308,6 +308,18 @@ export const fetchDonationsByUserId = async (userId) => {
     }
 };
 
+// Fetch donations by campaign ID (with messages)
+export const fetchDonationsByCampaignId = async (campaignId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/donations?campaign_id=${encodeURIComponent(campaignId)}`);
+        if (!response.ok) throw new Error('Failed to fetch donations');
+        return await response.json();
+    } catch (error) {
+        console.error('Fetch donations by campaign error:', error);
+        throw error;
+    }
+};
+
 // Update user profile
 export const updateUser = async (userId, userData) => {
     try {

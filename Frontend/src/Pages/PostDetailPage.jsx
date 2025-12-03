@@ -159,9 +159,17 @@ const PostDetailPage = () => {
               <div className="bg-white rounded-xl shadow-md p-6 mb-6">
                 {/* Header: Author & Time */}
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">
-                    {post.created_by?.charAt(0) || 'A'}
-                  </div>
+                  {post.creator_profile_picture ? (
+                    <img
+                      src={post.creator_profile_picture}
+                      alt={post.created_by}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-gradient-to-br from-[#A2FF59] to-[#13A3B5] rounded-full flex items-center justify-center text-xs font-bold text-white">
+                      {post.created_by?.charAt(0) || 'A'}
+                    </div>
+                  )}
                   <span className="font-semibold text-sm">
                     {post.created_by || 'Anonymous'}
                   </span>
@@ -235,9 +243,17 @@ const PostDetailPage = () => {
                     comments.map((comment) => (
                       <div key={comment.comment_id || comment.id} className="p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-start gap-2">
-                          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">
-                            {(comment.user_name || 'Anonymous User').charAt(0).toUpperCase()}
-                          </div>
+                          {comment.user_profile_picture ? (
+                            <img
+                              src={comment.user_profile_picture}
+                              alt={comment.user_name}
+                              className="w-8 h-8 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#A2FF59] to-[#13A3B5] rounded-full flex items-center justify-center text-xs font-bold text-white">
+                              {(comment.user_name || 'Anonymous User').charAt(0).toUpperCase()}
+                            </div>
+                          )}
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
                               <span className="font-semibold text-sm text-[#13A3B5]">

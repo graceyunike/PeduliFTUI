@@ -10,6 +10,7 @@ import DashboardPage from "./Pages/DashboardPage";
 import PaymentPage from "./Pages/PaymentPage";
 import PostDetailPage from "./Pages/PostDetailPage";
 import UserDashboard from "./Pages/userDashboard";
+import TimelinePostPage from "./Pages/TimelinePostPage";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         {/* Event */}
         <Route path="/event-campaign" element={<EventCampaignPage />} />
         <Route path="/event-detail/:id" element={<EventDetailPage />} />
+        <Route path="/timeline-posts" element={<TimelinePostPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/donate" element={<PaymentPage />} />
         <Route path="/post-detail/:postId" element={<PostDetailPage />} />
