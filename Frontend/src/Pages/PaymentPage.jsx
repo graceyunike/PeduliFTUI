@@ -20,14 +20,14 @@ const PaymentPage = () => {
 
     useEffect(() => {
         let mounted = true;
-        
+
         const loadCampaignData = async () => {
             setLoading(true);
             setError(null);
-            
+
             try {
                 if (!campaignId) throw new Error('No campaign selected');
-                
+
                 const campaignData = await fetchCampaignById(campaignId);
                 const mappedCampaign = {
                     campaign_id: campaignData.campaign_id,
@@ -39,9 +39,9 @@ const PaymentPage = () => {
                     collected_amount: campaignData.collected_amount || 0,
                     deadline: campaignData.deadline || campaignData.updatedAt || campaignData.createdAt || null
                 };
-                
+
                 if (mounted) setCampaign(mappedCampaign);
-                
+
                 // Load organizer information
                 if (mappedCampaign.organizer_id) {
                     await loadOrganizerInfo(mappedCampaign.organizer_id, mounted);
@@ -69,7 +69,7 @@ const PaymentPage = () => {
         };
 
         loadCampaignData();
-        
+
         return () => { mounted = false; };
     }, [campaignId]);
 
@@ -78,7 +78,7 @@ const PaymentPage = () => {
             const user = getCurrentUser();
             if (!user) throw new Error('User must be logged in to donate');
             if (!campaign) throw new Error('No campaign selected');
-            
+
             const donationAmount = Number(String(amount).replace(/[^0-9.-]+/g, ''));
             if (!donationAmount || donationAmount <= 0) {
                 throw new Error('Masukkan jumlah donasi yang valid');
@@ -113,6 +113,69 @@ const PaymentPage = () => {
             alert(err.message || 'Gagal mengirim donasi');
         }
     };
+
+    const handlePayNow = async () => {
+        const user = getCurrentUser();   // <= FIX
+
+        if (!user) {
+            alert("Anda harus login terlebih dahulu");
+            return;
+        }
+
+        if (!amount || amount <= 0) {
+            alert("Masukkan jumlah donasi");
+            return;
+        }
+
+        try {
+            const orderId = "ORDER-" + Date.now();
+
+            const res = await fetch("http://localhost:3000/payments/create-transaction", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    amount: Number(amount),
+                    donor_name: user.name || "Anonymous",   // <= FIX
+                    donor_email: user.email || "noemail@example.com",   // <= FIX
+                })
+            });
+
+            const data = await res.json();
+
+            if (!data.token) {
+                alert("Gagal mendapatkan token Midtrans");
+                return;
+            }
+
+            window.snap.pay(data.token, {
+                onSuccess: async () => {
+                    await createDonation({
+                        donation_id: orderId,
+                        campaign_id: campaignId,
+                        user_id: user.user_id,  // <= FIX
+                        user_name: isAnonymous ? "Anonymous" : user.name,  // <= FIX
+                        message,
+                        amount: Number(amount),
+                        anonymous: isAnonymous,
+                    });
+
+                    alert("Pembayaran Berhasil!");
+                    navigate('/');
+                },
+
+                onPending: (res) => console.log("Pending:", res),
+                onError: (res) => console.log("Error:", res),
+                onClose: () => console.log("Popup ditutup user")
+            });
+
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi error saat memproses pembayaran");
+        }
+    };
+
+
 
     const handleAmountChange = (e) => {
         // keep amount as string; conversion to number happens on submit
@@ -151,7 +214,7 @@ const PaymentPage = () => {
                         <section className="campaign-section">
                             <div className="campaign-info-card">
                                 <h1 className="campaign-title">{campaign.title}</h1>
-                                
+
                                 <div className="campaign-description">
                                     <p>{campaign.description}</p>
                                 </div>
@@ -193,10 +256,10 @@ const PaymentPage = () => {
                                             <span className="progress-label">Target</span>
                                         </div>
                                     </div>
-                                    
+
                                     <div className="progress-bar-container">
-                                        <div 
-                                            className="progress-bar" 
+                                        <div
+                                            className="progress-bar"
                                             style={{ width: `${progressPercentage}%` }}
                                         />
                                     </div>
@@ -211,7 +274,7 @@ const PaymentPage = () => {
                                     <h2 className="donation-title">Buat Donasi</h2>
                                     <p className="donation-subtitle">Bantu wujudkan campaign ini</p>
                                 </div>
-                                
+
                                 <div className="donation-form">
                                     {/* Amount Input */}
                                     <div className="form-group">
@@ -228,28 +291,28 @@ const PaymentPage = () => {
                                             />
                                         </div>
                                         <div className="amount-suggestions">
-                                            <button 
+                                            <button
                                                 type="button"
                                                 className="amount-suggestion"
                                                 onClick={() => setAmount('25000')}
                                             >
                                                 Rp 25.000
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 className="amount-suggestion"
                                                 onClick={() => setAmount('50000')}
                                             >
                                                 Rp 50.000
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 className="amount-suggestion"
                                                 onClick={() => setAmount('100000')}
                                             >
                                                 Rp 100.000
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 className="amount-suggestion"
                                                 onClick={() => setAmount('250000')}
@@ -295,9 +358,10 @@ const PaymentPage = () => {
                                     </div>
 
                                     {/* Submit Button */}
-                                    <button 
-                                        className="submit-donation-btn" 
-                                        onClick={handleSubmit}
+                                    <button
+                                        className="submit-donation-btn"
+                                        type="button"
+                                        onClick={handlePayNow}
                                         disabled={!amount || amount <= 0}
                                     >
                                         <span className="btn-text">Donasi Sekarang</span>
@@ -305,7 +369,6 @@ const PaymentPage = () => {
                                             {amount ? `Rp ${parseInt(amount).toLocaleString('id-ID')}` : ''}
                                         </span>
                                     </button>
-
                                     <p className="security-notice">
                                         🔒 Donasi Anda aman dan terjamin keamanannya
                                     </p>

@@ -5,7 +5,7 @@ const EventBox = ({ campaign_id, picture, title, description }) => {
   const truncateToWords = (text, limit = 15) => {
     const words = text.split(' ');
     if (words.length <= limit) return text;
-     return words.slice(0, limit).join(' ') + '...';
+    return words.slice(0, limit).join(' ') + '...';
   };
 
   return (

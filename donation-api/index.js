@@ -10,6 +10,7 @@ import donationRoutes from './routes/donationRoutes.js';
 import timelinePostsRoutes from './routes/timelinePostsRoutes.js';
 import commentsRoutes from './routes/commentsRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import paymentRoutes from "./routes/paymentRoutes.js";
 
 
 const app = express();
@@ -36,6 +37,7 @@ app.use('/donations', donationRoutes);
 app.use('/timeline-posts', timelinePostsRoutes);
 app.use('/api/comments', commentsRoutes);
 app.use('/auth', authRoutes);
+app.use("/payments", paymentRoutes);
 
 
 app.get('/', (req, res) => {
