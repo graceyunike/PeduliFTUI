@@ -39,7 +39,7 @@ Guidelines:
                 'X-Title': 'PeduliFTUI Sentiment Analysis'
             },
             body: JSON.stringify({
-                model: 'openai/gpt-3.5-turbo',
+                model: 'openai/deepseek',
                 messages: [
                     {
                         role: 'system',

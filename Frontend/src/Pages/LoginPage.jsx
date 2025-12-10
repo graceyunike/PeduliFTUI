@@ -29,7 +29,7 @@ export default function LoginPage() {
             if (result.user.role?.toLowerCase() === "admin") {
                 navigate("/dashboard");
             } else {
-                navigate("/event-campaign");
+                navigate("/");
             }
 
         } catch (err) {
